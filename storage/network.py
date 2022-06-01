@@ -14,26 +14,20 @@ class Network:
             graph.add_node(spanid, name=name, parentid=parentid)
             self._services[servicename] = { traceid: graph }
         else:
-            if traceid not in self._services:
+            if traceid not in self._services[servicename]:
                 self._services[servicename][traceid] = nx.DiGraph(traceid=traceid)
 
             graph = self._services[servicename][traceid]
             graph.add_node(spanid, name=name, parentid=parentid)
-            
             if parentid != '0000000000000000':
                 graph.add_edge(parentid, spanid)
-            # print(f'{traceid} {spanid} {parentid}')
-            self._services[servicename][traceid] = graph
 
     def get_successors(self, servicename, traceid, spanid):
         return self._services[servicename][traceid].successors(spanid)
 
     def get_data(self):
-        for service, service_data in self._services.items():
-            print(service)
-            for traceid, graph in service_data.items():
-                print(f'\t{traceid}')
-                print(json.dumps(list(graph.nodes.data()), indent=4))
+        for trace, graph in self._services['BTracer'].items():
+            print(json.dumps(list(graph.nodes.data()), indent=4))
 
 if __name__ == '__main__':
     network = Network()
@@ -51,15 +45,13 @@ if __name__ == '__main__':
     network.add_node('BTracer', '6ea1e01ac59d90b236224dbd65d9dbff', '483aa59976dce3e1', 'ThirdMain', '0a5dae65161276a1')
     network.add_node('BTracer', '6ea1e01ac59d90b236224dbd65d9dbff', '94a8eefd77d9be19', 'FourthMain', '483aa59976dce3e1')
 
-    # network.add_node('BTracer', '2145435fsdfjk234bj23kjnk235jk325', '94a8eefd77d9be19', 'RedisCall', '0000000000000000')
-    # network.add_node('BTracer', '2145435fsdfjk234bj23kjnk235jk325', '483aa59976dce3e1', 'RedisCall', '94a8eefd77d9be19')
+    network.add_node('BTracer', '2145435fsdfjk234bj23kjnk235jk325', '94a8eefd77d9be19', 'RedisCall', '0000000000000000')
+    network.add_node('BTracer', '2145435fsdfjk234bj23kjnk235jk325', '483aa59976dce3e1', 'RedisCall', '94a8eefd77d9be19')
 
-    # network.add_node('BunaSiua', '2145435fsdfjk234bj23kjnk235jk325', '94a8eefd77d9be19', 'RedisCall', '0000000000000000')
-    # network.add_node('BunaSiua', '2145435fsdfjk234bj23kjnk235jk325', '483aa59976dce3e1', 'RedisCall', '94a8eefd77d9be19')
+    network.add_node('BunaSiua', '2145435fsdfjk234bj23kjnk235jk325', '94a8eefd77d9be19', 'RedisCall', '0000000000000000')
+    network.add_node('BunaSiua', '2145435fsdfjk234bj23kjnk235jk325', '483aa59976dce3e1', 'RedisCall', '94a8eefd77d9be19')
 
     network.get_data()
-
-    # print(list(network.get_successors('BTracer', '2145435fsdfjk234bj23kjnk235jk325', '94a8eefd77d9be19')))
 
     # serialized_data = { 'nodes': list(DG.nodes.data()), 'edges': list(DG.edges) }
     # with open('__index001', 'wb') as fo:
