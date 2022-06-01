@@ -9,8 +9,8 @@ class StorageServicer(storage_pb2_grpc.StorageServicer):
         super().__init__()
     
     def Store(self, request, context):
-        print('request received')
-        return storage_pb2.Response(status=200, message='buna')
+        print(request)
+        return storage_pb2.StorageResponse(status=200, message='buna')
 
 if __name__ == '__main__':
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

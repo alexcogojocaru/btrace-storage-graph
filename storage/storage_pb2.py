@@ -14,45 +14,45 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rstorage.proto\"=\n\tTimestamp\x12\x0f\n\x07started\x18\x01 \x01(\x03\x12\r\n\x05\x65nded\x18\x02 \x01(\x03\x12\x10\n\x08\x64uration\x18\x03 \x01(\x02\"\x83\x01\n\x04Span\x12\x13\n\x0bserviceName\x18\x01 \x01(\t\x12\x0f\n\x07traceID\x18\x02 \x01(\t\x12\x0e\n\x06spanID\x18\x03 \x01(\t\x12\x14\n\x0cparentSpanID\x18\x04 \x01(\t\x12\x10\n\x08spanName\x18\x05 \x01(\t\x12\x1d\n\ttimestamp\x18\x06 \x01(\x0b\x32\n.Timestamp\"+\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t2$\n\x07Storage\x12\x19\n\x05Store\x12\x05.Span\x1a\t.ResponseB\x12Z\x10./btrace_storageb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rstorage.proto\"D\n\x10StorageTimestamp\x12\x0f\n\x07started\x18\x01 \x01(\x03\x12\r\n\x05\x65nded\x18\x02 \x01(\x03\x12\x10\n\x08\x64uration\x18\x03 \x01(\x02\"\x91\x01\n\x0bStorageSpan\x12\x13\n\x0bserviceName\x18\x01 \x01(\t\x12\x0f\n\x07traceID\x18\x02 \x01(\t\x12\x0e\n\x06spanID\x18\x03 \x01(\t\x12\x14\n\x0cparentSpanID\x18\x04 \x01(\t\x12\x10\n\x08spanName\x18\x05 \x01(\t\x12$\n\ttimestamp\x18\x06 \x01(\x0b\x32\x11.StorageTimestamp\"2\n\x0fStorageResponse\x12\x0e\n\x06status\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t22\n\x07Storage\x12\'\n\x05Store\x12\x0c.StorageSpan\x1a\x10.StorageResponseB\x12Z\x10./btrace_storageb\x06proto3')
 
 
 
-_TIMESTAMP = DESCRIPTOR.message_types_by_name['Timestamp']
-_SPAN = DESCRIPTOR.message_types_by_name['Span']
-_RESPONSE = DESCRIPTOR.message_types_by_name['Response']
-Timestamp = _reflection.GeneratedProtocolMessageType('Timestamp', (_message.Message,), {
-  'DESCRIPTOR' : _TIMESTAMP,
+_STORAGETIMESTAMP = DESCRIPTOR.message_types_by_name['StorageTimestamp']
+_STORAGESPAN = DESCRIPTOR.message_types_by_name['StorageSpan']
+_STORAGERESPONSE = DESCRIPTOR.message_types_by_name['StorageResponse']
+StorageTimestamp = _reflection.GeneratedProtocolMessageType('StorageTimestamp', (_message.Message,), {
+  'DESCRIPTOR' : _STORAGETIMESTAMP,
   '__module__' : 'storage_pb2'
-  # @@protoc_insertion_point(class_scope:Timestamp)
+  # @@protoc_insertion_point(class_scope:StorageTimestamp)
   })
-_sym_db.RegisterMessage(Timestamp)
+_sym_db.RegisterMessage(StorageTimestamp)
 
-Span = _reflection.GeneratedProtocolMessageType('Span', (_message.Message,), {
-  'DESCRIPTOR' : _SPAN,
+StorageSpan = _reflection.GeneratedProtocolMessageType('StorageSpan', (_message.Message,), {
+  'DESCRIPTOR' : _STORAGESPAN,
   '__module__' : 'storage_pb2'
-  # @@protoc_insertion_point(class_scope:Span)
+  # @@protoc_insertion_point(class_scope:StorageSpan)
   })
-_sym_db.RegisterMessage(Span)
+_sym_db.RegisterMessage(StorageSpan)
 
-Response = _reflection.GeneratedProtocolMessageType('Response', (_message.Message,), {
-  'DESCRIPTOR' : _RESPONSE,
+StorageResponse = _reflection.GeneratedProtocolMessageType('StorageResponse', (_message.Message,), {
+  'DESCRIPTOR' : _STORAGERESPONSE,
   '__module__' : 'storage_pb2'
-  # @@protoc_insertion_point(class_scope:Response)
+  # @@protoc_insertion_point(class_scope:StorageResponse)
   })
-_sym_db.RegisterMessage(Response)
+_sym_db.RegisterMessage(StorageResponse)
 
 _STORAGE = DESCRIPTOR.services_by_name['Storage']
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'Z\020./btrace_storage'
-  _TIMESTAMP._serialized_start=17
-  _TIMESTAMP._serialized_end=78
-  _SPAN._serialized_start=81
-  _SPAN._serialized_end=212
-  _RESPONSE._serialized_start=214
-  _RESPONSE._serialized_end=257
-  _STORAGE._serialized_start=259
-  _STORAGE._serialized_end=295
+  _STORAGETIMESTAMP._serialized_start=17
+  _STORAGETIMESTAMP._serialized_end=85
+  _STORAGESPAN._serialized_start=88
+  _STORAGESPAN._serialized_end=233
+  _STORAGERESPONSE._serialized_start=235
+  _STORAGERESPONSE._serialized_end=285
+  _STORAGE._serialized_start=287
+  _STORAGE._serialized_end=337
 # @@protoc_insertion_point(module_scope)

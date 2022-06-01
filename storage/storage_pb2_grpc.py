@@ -16,8 +16,8 @@ class StorageStub(object):
         """
         self.Store = channel.unary_unary(
                 '/Storage/Store',
-                request_serializer=storage__pb2.Span.SerializeToString,
-                response_deserializer=storage__pb2.Response.FromString,
+                request_serializer=storage__pb2.StorageSpan.SerializeToString,
+                response_deserializer=storage__pb2.StorageResponse.FromString,
                 )
 
 
@@ -35,8 +35,8 @@ def add_StorageServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'Store': grpc.unary_unary_rpc_method_handler(
                     servicer.Store,
-                    request_deserializer=storage__pb2.Span.FromString,
-                    response_serializer=storage__pb2.Response.SerializeToString,
+                    request_deserializer=storage__pb2.StorageSpan.FromString,
+                    response_serializer=storage__pb2.StorageResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -60,7 +60,7 @@ class Storage(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Storage/Store',
-            storage__pb2.Span.SerializeToString,
-            storage__pb2.Response.FromString,
+            storage__pb2.StorageSpan.SerializeToString,
+            storage__pb2.StorageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
