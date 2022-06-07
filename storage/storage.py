@@ -9,6 +9,7 @@ from loguru import logger
 from network import Network
 from queue import Queue
 from snapshot import SnapshotEngine
+from threading import Event
 
 
 class StorageEngineServicer(Engine, storage_pb2_grpc.StorageServicer):
@@ -30,11 +31,10 @@ if __name__ == '__main__':
     fo.close()
 
     network = Network()
-    sync_queue = Queue()
+    event, sync_queue = Event(), Queue()
 
     storage_engine = StorageEngineServicer(network, sync_queue)
-    
-    snapshot_engine = SnapshotEngine(network, sync_queue, config['snapshot']['path'])
+    snapshot_engine = SnapshotEngine(network, sync_queue, event, config['snapshot']['path'])
     snapshot_engine.start()
 
     host = config['server']['host']
@@ -44,6 +44,12 @@ if __name__ == '__main__':
     storage_pb2_grpc.add_StorageServicer_to_server(storage_engine, server)
     server.add_insecure_port(f'{host}:{port}')
     
-    logger.debug(f'Starting gRPC server on {host}:{port}')
-    server.start()
-    server.wait_for_termination()
+    try:
+        logger.debug(f'Starting gRPC server on {host}:{port}')
+        server.start()
+        server.wait_for_termination()
+    except:
+        logger.debug('Received stop signal')
+        
+        event.set()
+        snapshot_engine.join()
