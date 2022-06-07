@@ -49,7 +49,5 @@ if __name__ == '__main__':
         server.start()
         server.wait_for_termination()
     except:
-        logger.debug('Received stop signal')
-        
         event.set()
         snapshot_engine.join()
