@@ -1,58 +1,63 @@
-import json
-from typing import Dict, List
 import networkx as nx
-import pickle
 
+from enum import Enum
+from storage_pb2 import StorageSpan
+from typing import Dict
+
+
+class NodeTag(Enum):
+    TRACE = 0x1
+    SPAN  = 0x2
 
 class Network:
+    NULL_SPAN = '0000000000000000'
+    
     def __init__(self) -> None:        
-        self._services: Dict[str, Dict[str, nx.DiGraph]] = {}
+        self._services: Dict[str, nx.DiGraph] = {}
 
-    def add_node(self, servicename, traceid, spanid, name, parentid):
-        if servicename not in self._services:
-            graph = nx.DiGraph(traceid=traceid)
-            graph.add_node(spanid, name=name, parentid=parentid)
-            self._services[servicename] = { traceid: graph }
-        else:
-            if traceid not in self._services[servicename]:
-                self._services[servicename][traceid] = nx.DiGraph(traceid=traceid)
+    def add_service(self, service_name: str) -> bool:
+        '''
+            Adds a new service in the network
 
-            graph = self._services[servicename][traceid]
-            graph.add_node(spanid, name=name, parentid=parentid)
-            if parentid != '0000000000000000':
-                graph.add_edge(parentid, spanid)
+            @param service_name :str: - the name of the service
+            @returns :bool: - True if the service was added, False if the service already exists
+        '''
+        
+        if service_name not in self._services:
+            self._services[service_name] = nx.DiGraph(service=service_name)
+            return True
+        return False
 
-    def get_successors(self, servicename, traceid, spanid):
-        return self._services[servicename][traceid].successors(spanid)
+    def add_trace(self, service_name: str, traceid: str):
+        self.add_service(service_name)
+        self._services[service_name].add_node(traceid, tag=NodeTag.TRACE.value)
+
+    def add_span(self, service_name: str, traceid: str, span: StorageSpan):
+        self.add_trace(service_name, traceid)
+
+        source = traceid if span.parentSpanID == self.NULL_SPAN else span.parentSpanID
+        self._services[service_name].add_node(span.spanID, tag=NodeTag.SPAN.value, data=self._proto_to_dict(span))
+        self._services[service_name].add_edge(source, span.spanID)
+        return True
+
+    def _proto_to_dict(self, span: StorageSpan):
+        return {
+            'spanName':     span.spanName,
+            'traceID':      span.traceID,
+            'spanID':       span.spanID,
+            'parentSpanID': span.parentSpanID,
+        }
+
+    def load_service_data(self, service_name: str, data: dict):
+        self._services[service_name] = nx.node_link_graph(data)
 
     def get_data(self):
-        for trace, graph in self._services['BTracer'].items():
-            print(json.dumps(list(graph.nodes.data()), indent=4))
-
-if __name__ == '__main__':
-    network = Network()
-
-    args = { 
-        'servicename': 'BTracer',
-        'traceid': '6ea1e01ac59d90b236224dbd65d9dbff',
-        'spanid': '0a5dae65161276a1',
-        'name': 'Main',
-        'parentid': '0000000000000000'
-    }
-
-    network.add_node(**args)
-    network.add_node('BTracer', '6ea1e01ac59d90b236224dbd65d9dbff', 'ee2d8605865b982b', 'SecondMain', '0a5dae65161276a1')
-    network.add_node('BTracer', '6ea1e01ac59d90b236224dbd65d9dbff', '483aa59976dce3e1', 'ThirdMain', '0a5dae65161276a1')
-    network.add_node('BTracer', '6ea1e01ac59d90b236224dbd65d9dbff', '94a8eefd77d9be19', 'FourthMain', '483aa59976dce3e1')
-
-    network.add_node('BTracer', '2145435fsdfjk234bj23kjnk235jk325', '94a8eefd77d9be19', 'RedisCall', '0000000000000000')
-    network.add_node('BTracer', '2145435fsdfjk234bj23kjnk235jk325', '483aa59976dce3e1', 'RedisCall', '94a8eefd77d9be19')
-
-    network.add_node('BunaSiua', '2145435fsdfjk234bj23kjnk235jk325', '94a8eefd77d9be19', 'RedisCall', '0000000000000000')
-    network.add_node('BunaSiua', '2145435fsdfjk234bj23kjnk235jk325', '483aa59976dce3e1', 'RedisCall', '94a8eefd77d9be19')
-
-    network.get_data()
-
-    # serialized_data = { 'nodes': list(DG.nodes.data()), 'edges': list(DG.edges) }
-    # with open('__index001', 'wb') as fo:
-    #     pickle.dump(serialized_data, fo)
+        return { 
+            service_name: nx.node_link_data(self._services[service_name]) 
+            for service_name in self._services 
+        }
+    
+    def get_service_data(self, service_name: str):
+        if service_name in self._services:
+            return nx.node_link_data(self._services[service_name])
+        return None
