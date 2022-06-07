@@ -24,6 +24,20 @@ class StorageEngineServicer(Engine, storage_pb2_grpc.StorageServicer):
 
         return storage_pb2.StorageResponse(status=200, message='DEBUG')
 
+    def GetServices(self, request, context):
+        logger.debug('GetServices')
+        for service_name in self._network._services.keys():
+            yield storage_pb2.ServiceName(name=service_name)
+
+    def GetServiceData(self, request, context):
+        return super().GetServiceData(request, context)
+
+    def GetMultipleServicesData(self, request_iterator, context):
+        return super().GetMultipleServicesData(request_iterator, context)
+
+    def GetData(self, request, context):
+        return super().GetData(request, context)
+
 if __name__ == '__main__':
     config_path = 'storage/config/storage.yml'
     fo = open(config_path, 'r')

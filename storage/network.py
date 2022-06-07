@@ -15,7 +15,7 @@ class Network:
     def __init__(self) -> None:        
         self._services: Dict[str, nx.DiGraph] = {}
 
-    def add_service(self, service_name: str) -> bool:
+    def __add_service(self, service_name: str) -> bool:
         '''
             Adds a new service in the network
 
@@ -28,12 +28,19 @@ class Network:
             return True
         return False
 
-    def add_trace(self, service_name: str, traceid: str):
-        self.add_service(service_name)
+    def __add_trace(self, service_name: str, traceid: str):
+        '''
+            Adds a new trace node to the service 
+
+            @param service_name :str: - the name of the service
+            @param traceid :str: - 32 bytes trace id
+            @returns
+        '''
+        self.__add_service(service_name)
         self._services[service_name].add_node(traceid, tag=NodeTag.TRACE.value)
 
     def add_span(self, service_name: str, traceid: str, span: StorageSpan):
-        self.add_trace(service_name, traceid)
+        self.__add_trace(service_name, traceid)
 
         source = traceid if span.parentSpanID == self.NULL_SPAN else span.parentSpanID
         self._services[service_name].add_node(span.spanID, tag=NodeTag.SPAN.value, data=self._proto_to_dict(span))
