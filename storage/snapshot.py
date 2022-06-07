@@ -1,3 +1,5 @@
+import hashlib
+import json
 from engine import Engine
 from loguru import logger
 from network import Network
@@ -31,16 +33,25 @@ class SnapshotEngine(Engine, Thread):
                 self._network.load_service_data(service_name, data)
 
     def run(self):
+        last_dict_hash = None
+        current_dict_hash = None
+
         while not self._event.wait(1):
             if self._queue.qsize():
+                print(f'{current_dict_hash} {last_dict_hash}')
                 service_name = self._queue.get()
                 logger.debug(f'Received event: {service_name} node')
                 data = self._network.get_service_data(service_name)
-    
-                node_filename = f'_node_{service_name}'
-                with open(os.path.join(self._nodes_folder_path, node_filename), 'wb') as fo:
-                    pickle.dump(data, fo)
-    
+
+                current_dict_hash = json.dumps(data, sort_keys=True).encode()
+                current_dict_hash = hashlib.md5(current_dict_hash).hexdigest()
+                if current_dict_hash != last_dict_hash:
+                    logger.debug('Different hash - indexing to file system')
+                    node_filename = f'_node_{service_name}'
+                    with open(os.path.join(self._nodes_folder_path, node_filename), 'wb') as fo:
+                        pickle.dump(data, fo)
+
+                last_dict_hash = current_dict_hash
                 self._queue.task_done()
         
         logger.debug('SnapshotEngine stopping')

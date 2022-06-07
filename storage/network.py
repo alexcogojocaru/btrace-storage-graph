@@ -1,3 +1,5 @@
+import hashlib
+import json
 import networkx as nx
 
 from enum import Enum
@@ -68,3 +70,10 @@ class Network:
         if service_name in self._services:
             return nx.node_link_data(self._services[service_name])
         return None
+
+if __name__ == '__main__':
+    n = Network()
+
+    n.add_span('ScooterApp', '12323', StorageSpan())
+    encoded = json.dumps(n.get_service_data('ScooterApp'), sort_keys=True).encode()
+    print(hashlib.md5(encoded).hexdigest())
