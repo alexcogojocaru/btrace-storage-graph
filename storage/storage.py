@@ -24,7 +24,7 @@ class StorageEngineServicer(Engine, storage_pb2_grpc.StorageServicer):
         return storage_pb2.StorageResponse(status=200, message='DEBUG')
 
 if __name__ == '__main__':
-    config_path = '../config/storage.yml'
+    config_path = 'storage/config/storage.yml'
     fo = open(config_path, 'r')
     config = yaml.load(fo.read(), yaml.SafeLoader)
     fo.close()
