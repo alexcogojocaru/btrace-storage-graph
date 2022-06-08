@@ -4,4 +4,4 @@ __pycache__/
 
 __index*
 snapshots/
-# *_pb2*
+*_pb2*
