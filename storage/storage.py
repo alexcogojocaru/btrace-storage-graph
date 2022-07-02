@@ -1,3 +1,4 @@
+import json
 import grpc
 import storage_pb2
 import storage_pb2_grpc
@@ -30,7 +31,23 @@ class StorageEngineServicer(Engine, storage_pb2_grpc.StorageServicer):
             yield storage_pb2.ServiceName(name=service_name)
 
     def GetServiceData(self, request, context):
-        return super().GetServiceData(request, context)
+        service_data = self._network.get_service_data(request.name)
+
+        service_processed = {}
+        span_list = list(filter(lambda data: data['tag'] == 2, service_data['nodes']))
+        for span in span_list:
+            trace_id = span['data']['traceID']
+            span_id = span['id']
+
+            if trace_id not in service_processed:
+                service_processed[trace_id] = [span_id]
+            else:
+                service_processed[trace_id].append(span_id)    
+
+        for trace_id, spans in service_processed.items():
+            spans = [storage_pb2.StorageSpan(spanID=id) for id in spans]
+            print(spans)
+            yield storage_pb2.ServiceResponse(traceId=trace_id, spans=spans)
 
     def GetMultipleServicesData(self, request_iterator, context):
         return super().GetMultipleServicesData(request_iterator, context)

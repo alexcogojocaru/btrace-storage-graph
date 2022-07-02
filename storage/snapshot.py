@@ -38,7 +38,6 @@ class SnapshotEngine(Engine, Thread):
 
         while not self._event.wait(1):
             if self._queue.qsize():
-                print(f'{current_dict_hash} {last_dict_hash}')
                 service_name = self._queue.get()
                 logger.debug(f'Received event: {service_name} node')
                 data = self._network.get_service_data(service_name)
