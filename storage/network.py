@@ -55,6 +55,7 @@ class Network:
             'traceID':      span.traceID,
             'spanID':       span.spanID,
             'parentSpanID': span.parentSpanID,
+            'logs':         [{ 'type': log.type, 'value': log.value} for log in span.logs]
         }
 
     def load_service_data(self, service_name: str, data: dict):

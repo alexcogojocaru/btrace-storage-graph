@@ -35,18 +35,27 @@ class StorageEngineServicer(Engine, storage_pb2_grpc.StorageServicer):
 
         service_processed = {}
         span_list = list(filter(lambda data: data['tag'] == 2, service_data['nodes']))
+        data_with_spans = {}
         for span in span_list:
             trace_id = span['data']['traceID']
             span_id = span['id']
 
-            if trace_id not in service_processed:
-                service_processed[trace_id] = [span_id]
+            if trace_id not in data_with_spans:
+                data_with_spans[trace_id] = {span_id: span['data']}
             else:
-                service_processed[trace_id].append(span_id)    
+                data_with_spans[trace_id][span_id] = span['data']
+
+            if trace_id not in service_processed:
+                service_processed[trace_id] = [span['data']]
+            else:
+                service_processed[trace_id].append(span['data'])
+
+        with open('service_data.json', 'w') as fo:
+            json.dump(service_processed, fo, indent=4)
 
         for trace_id, spans in service_processed.items():
-            spans = [storage_pb2.StorageSpan(spanID=id) for id in spans]
-            print(spans)
+            logs = [storage_pb2.StorageKeyValue(type=log['type'], value=log['value']) for log in span['data']['logs']]
+            spans = [storage_pb2.StorageSpan(logs=logs, spanID=span['spanID'], spanName=span['spanName'], parentSpanID=span['parentSpanID']) for span in spans]
             yield storage_pb2.ServiceResponse(traceId=trace_id, spans=spans)
 
     def GetMultipleServicesData(self, request_iterator, context):

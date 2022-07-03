@@ -47,7 +47,8 @@ class SnapshotEngine(Engine, Thread):
                 if current_dict_hash != last_dict_hash:
                     logger.debug('Different hash - indexing to file system')
                     node_filename = f'_node_{service_name}'
-                    with open(os.path.join(self._nodes_folder_path, node_filename), 'wb') as fo:
+                    node_file_path = os.path.join(self._nodes_folder_path, node_filename)
+                    with open(node_file_path, 'wb') as fo:
                         pickle.dump(data, fo)
 
                 last_dict_hash = current_dict_hash
