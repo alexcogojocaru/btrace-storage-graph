@@ -2,6 +2,7 @@ import hashlib
 import json
 import networkx as nx
 
+from datetime import datetime
 from enum import Enum
 from storage_pb2 import StorageSpan
 from typing import Dict
@@ -55,7 +56,12 @@ class Network:
             'traceID':      span.traceID,
             'spanID':       span.spanID,
             'parentSpanID': span.parentSpanID,
-            'logs':         [{ 'type': log.type, 'value': log.value} for log in span.logs]
+            'timestamp': {
+                'started':  span.timestamp.started,
+                'ended':    span.timestamp.ended,
+                'duration': span.timestamp.duration,
+            },
+            'logs': [{ 'type': log.type, 'value': log.value} for log in span.logs]
         }
 
     def load_service_data(self, service_name: str, data: dict):

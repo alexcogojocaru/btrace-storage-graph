@@ -19,7 +19,7 @@ class StorageEngineServicer(Engine, storage_pb2_grpc.StorageServicer):
 
     def Store(self, request, context):
         logger.debug(f'serviceName={request.serviceName} traceid={request.traceID} spanid={request.spanID}')
-        
+        print(f'{request.timestamp.started} {request.timestamp.ended} {request.timestamp.duration}')
         self._network.add_span(request.serviceName, request.traceID, request)
         self._queue.put(request.serviceName)
 
@@ -28,6 +28,7 @@ class StorageEngineServicer(Engine, storage_pb2_grpc.StorageServicer):
     def GetServices(self, request, context):
         logger.debug('GetServices')
         for service_name in self._network._services.keys():
+            print(service_name)
             yield storage_pb2.ServiceName(name=service_name)
 
     def GetServiceData(self, request, context):
@@ -54,9 +55,14 @@ class StorageEngineServicer(Engine, storage_pb2_grpc.StorageServicer):
             json.dump(service_processed, fo, indent=4)
 
         for trace_id, spans in service_processed.items():
-            logs = [storage_pb2.StorageKeyValue(type=log['type'], value=log['value']) for log in span['data']['logs']]
-            spans = [storage_pb2.StorageSpan(logs=logs, spanID=span['spanID'], spanName=span['spanName'], parentSpanID=span['parentSpanID']) for span in spans]
-            yield storage_pb2.ServiceResponse(traceId=trace_id, spans=spans)
+            payload_spans = []
+            for span in spans:
+                logs = [storage_pb2.StorageKeyValue(type=log['type'], value=log['value']) for log in span['logs']]    
+                timestamp = storage_pb2.StorageTimestamp(started=span['timestamp']['started'], ended=span['timestamp']['ended'], duration=span['timestamp']['duration'])
+                payload_spans.append(storage_pb2.StorageSpan(spanID=span['spanID'], spanName=span['spanName'], parentSpanID=span['parentSpanID'], timestamp=timestamp, logs=logs))
+
+            print('yield')
+            yield storage_pb2.ServiceResponse(traceId=trace_id, spans=payload_spans)
 
     def GetMultipleServicesData(self, request_iterator, context):
         return super().GetMultipleServicesData(request_iterator, context)
